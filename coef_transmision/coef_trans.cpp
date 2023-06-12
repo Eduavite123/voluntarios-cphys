@@ -2,7 +2,6 @@
 #include <cmath>
 #include <complex>
 #include <fstream>
-#include <stdlib.h>
 
 #define MAX 1000
 #define PI 3.14159265
@@ -30,22 +29,21 @@ int main(){
     complex<double> alpha[MAX], A_neg, A_0[MAX], A_pos, gamma[MAX], beta[MAX], b[MAX], xi[MAX];
     complex<double> i (0.0,1.0); 
 
-    //Cálculo del coeficiente de transmisión
-    double mT=0; //nº de veces que se encuentra la partícula a la derecha del potencial
-    double P_D=0; //Probabilidad de encontrar la partícula a la derecha de la barrera
-    int n_D=0; //tiempo n en el que se encuentra el primer máximo local de P_D(t)
-    double prev=0, PD_nD;
-    double p, K;
+    //Cálculo coef de transmisión
+    int mT=0, Nexp;
+    double P_D, p;
+    double K;
     //-------------------------------------------------------------------------------------
 
     //--------------------------CONDICIONES INICIALES--------------------------------------
-    t=MAX*2;
+    t=MAX;
+    Nexp=1000;
     //Parámetros del pozo:
     N=MAX; //Tamaño del pozo  
     nc=N/15.0; //# ciclos. Lo elegimos así para que haya 4 ciclos
 
     //Parámetros del potencial:
-    lambda=1; //Altura del potencial
+    lambda=0.5; //Altura del potencial
     k_0=2*PI*nc/(N*1.0);
     //Definimos el potencial
     for (j = 0; j < N; j++)
@@ -91,70 +89,73 @@ int main(){
         alpha[(N-2)-j]=-1.0/(A_0[(N-1)-j]+alpha[(N-1)-j]);
     }
     //-------------------------------------------------------------------------------------
-
-    //--------------------------ALGORITMO EC. SCHRODINGER----------------------------------
-    for(n=0;n<t;n++)
-    {
-        P_D=0;
-        for (j = N/5; j < N; j++)
-        {
-            P_D=P_D+abs(phi[j])*abs(phi[j]);
-        }
-        if (prev>P_D)
-        {
-            n_D=n-1;
-            PD_nD=prev;
-        }
-        else
-        {
-            prev=P_D;
-        }      
-        
-        //Cálculo de b
-        for(j=0;j<N;j++)
-        {
-            b[j]=4.0*i*phi[j]/S;
-        }
-        //Cálculo de beta
-        beta[N-1]=0; 
-        for(j=0;j<=N-2;j++)
-        {
-            beta[(N-2)-j]=(b[(N-1)-j]-beta[(N-1)-j])/(A_0[(N-1)-j]+alpha[(N-1)-j]);
-        }
-
-        //Cálculo de Xi
-        xi[0]=xi[N-1]=0;
-        for(j=0;j<N-1;j++)
-        {
-            xi[j+1]=alpha[j]*xi[j]+beta[j];
-        }
-
-        //Cálculo de phi en el siguiente instante de tiempo y la norma
-        for(j=0;j<N;j++)
-        {
-            phi[j]=xi[j]-phi[j];
-        }
-    }
-
-    cout << PD_nD << "  " << n_D << endl;
-
     srand(time(NULL));
-    for (int i = 0; i < 1000; i++)
+    //--------------------------ALGORITMO EC. SCHRODINGER----------------------------------
+    for (int exps = 0; exps < Nexp; exps++)
     {
-        p=(double)rand()/RAND_MAX;
-        if (p>PD_nD)
+        P_D=0.0;
+        //Inicializamos la f. de onda en cada experimento
+        norma=0.0;
+        for (j = 1; j < N-1; j++)
         {
-            mT=mT+1;
+            phi[j]=exp(i*k_0*(double)j)*exp((-((double)j-x_0)*((double)j-x_0))/(2*sigma*sigma));
+            norma=norma+abs(phi[j])*abs(phi[j]);
         }
-        else if (p<PD_nD)
+        //Normalizamos la f. de onda para que después salga la norma cercana a 1
+        for(j=0;j<N;j++)
         {
-            mT=mT;
+            phi[j]=phi[j]/sqrt(norma);
+        }       
+
+        for(n=0;n<=t/2;n++)
+        {
+
+            if (n==t/2)
+            {
+                for (int j = 4.0*N/5.0; j < N; j++)
+                {
+                    P_D=P_D+pow(abs(phi[j]),2);
+                }
+
+                p=(double)rand()/RAND_MAX;
+
+                if (p>P_D)
+                {
+                    mT=mT+1;
+                }
+                else mT=mT;                
+            }
+            
+            //Cálculo de b
+            for(j=0;j<N;j++)
+            {
+                b[j]=4.0*i*phi[j]/S;
+            }
+            //Cálculo de beta
+            beta[N-1]=0; 
+            for(j=0;j<=N-2;j++)
+            {
+                beta[(N-2)-j]=(b[(N-1)-j]-beta[(N-1)-j])/(A_0[(N-1)-j]+alpha[(N-1)-j]);
+            }
+
+            //Cálculo de Xi
+            xi[0]=xi[N-1]=0;
+            for(j=0;j<N-1;j++)
+            {
+                xi[j+1]=alpha[j]*xi[j]+beta[j];
+            }
+
+            //Cálculo de phi en el siguiente instante de tiempo 
+            for(j=0;j<N;j++)
+            {
+                phi[j]=xi[j]-phi[j];
+            }
         }
-        
+
     }
 
-    K=mT/1000.0;
-    cout << mT << endl;
+    K=mT/(double)Nexp;
+
     cout << "K= " << K << endl;
 
     return 0;
