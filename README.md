@@ -1,5 +1,6 @@
 # voluntarios-cphys
 En la carpeta pendulo_doble se encuentra todo lo relacionado al programa voluntario entregado:
+
     -anime_pos.py
         Este programa de python que se creó para representar el sistema solar se usa para representar el 
         péndulo doble. Tan solo se iban cambiando los límites de los ejes así como el título del gráfico
