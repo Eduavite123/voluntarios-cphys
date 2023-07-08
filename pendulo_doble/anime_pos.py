@@ -47,8 +47,8 @@ import numpy as np
 
 # Parámetros
 # ========================================
-file_in = "posiciones.dat" # Nombre del fichero de datos
-file_out = "posiciones" # Nombre del fichero de salida (sin extensión)
+file_in = "joel3.dat"#"posiciones.dat" # Nombre del fichero de datos
+file_out = "joel3" #"posiciones" # Nombre del fichero de salida (sin extensión)
 
 # Límites de los ejes X e Y
 x_min = -5

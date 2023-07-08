@@ -112,8 +112,8 @@ int main(){
     //SISTEMA 2
         //--------------------------CONDICIONES INICIALES--------------------------------------
     //Posiciones iniciales de las masas
-    y[0]=PI/2.0+0.0001;
-    y[1]=PI/2.0;
+    y[0]=PI/2.0;
+    y[1]=PI/2.001;
     //Momentos iniciales
     y[2]=0.0;
     y[3]=0.0;
@@ -186,8 +186,8 @@ int main(){
     //SISTEMA 3
         //--------------------------CONDICIONES INICIALES--------------------------------------
     //Posiciones iniciales de las masas
-    y[0]=PI/2.0+0.0002;
-    y[1]=PI/2.0;
+    y[0]=PI/2.0;
+    y[1]=PI/2.0005;
     //Momentos iniciales
     y[2]=0.0;
     y[3]=0.0;
